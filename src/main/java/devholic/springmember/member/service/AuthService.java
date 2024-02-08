@@ -7,13 +7,16 @@ import devholic.springmember.member.exception.exceptions.AlreadyUsedNicknameExce
 import devholic.springmember.member.service.dto.MemberCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class AuthService {
 
     private final MemberRepository memberRepository;
 
+    @Transactional
     public Long signup(final MemberCreateRequest request) {
         validateIsNotUsedNickname(request.nickname());
         MemberAuth memberAuth = new MemberAuth(request.nickname(), request.password());
