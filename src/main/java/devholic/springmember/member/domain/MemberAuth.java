@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class MemberAuth {
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @Column(nullable = false)
