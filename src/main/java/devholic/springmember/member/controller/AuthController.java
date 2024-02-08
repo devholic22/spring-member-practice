@@ -6,7 +6,9 @@ import devholic.springmember.member.service.AuthService;
 import devholic.springmember.member.service.dto.LoginRequest;
 import devholic.springmember.member.service.dto.MemberCreateRequest;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private static final String COOKIE_NAME = "AUTH";
+    private static final String SESSION_ATTRIBUTE_NAME = "AUTH";
     private static final int EXPIRATION_SECONDS = 60 * 60;
 
     private final AuthService authService;
@@ -57,5 +60,20 @@ public class AuthController {
 
     private String generateCookieValueByMember(final Member member) {
         return member.getNickname() + "." + member.getPassword();
+    }
+
+    @PostMapping("/login/session")
+    public ResponseEntity<Void> loginWithSession(@RequestBody @Valid final LoginRequest request,
+                                                 final HttpServletRequest servletRequest) {
+        HttpSession session = servletRequest.getSession();
+        Member loginMember = authService.loginWithCookieAndSession(request);
+        saveSessionValueByMember(session, loginMember);
+
+        return ResponseEntity.ok()
+                .build();
+    }
+
+    private static void saveSessionValueByMember(final HttpSession session, final Member member) {
+        session.setAttribute(SESSION_ATTRIBUTE_NAME, member.getMemberAuth());
     }
 }
