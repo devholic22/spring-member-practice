@@ -4,6 +4,8 @@ import devholic.springmember.member.domain.Member;
 import devholic.springmember.member.domain.MemberAuth;
 import devholic.springmember.member.domain.MemberRepository;
 import devholic.springmember.member.exception.exceptions.AlreadyUsedNicknameException;
+import devholic.springmember.member.exception.exceptions.MemberNotFoundException;
+import devholic.springmember.member.service.dto.LoginRequest;
 import devholic.springmember.member.service.dto.MemberCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,5 +33,14 @@ public class AuthService {
                 .ifPresent(member -> {
                     throw new AlreadyUsedNicknameException();
                 });
+    }
+
+    private Member findMemberByNickname(final String nickname) {
+        return memberRepository.findByNickname(nickname)
+                .orElseThrow(MemberNotFoundException::new);
+    }
+
+    public Member loginWithCookieAndSession(final LoginRequest request) {
+        return findMemberByNickname(request.nickname());
     }
 }
